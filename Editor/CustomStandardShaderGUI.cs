@@ -63,8 +63,6 @@ internal class CustomStandardShaderGUI : ShaderGUI
 	MaterialProperty occlusionStrength = null;
 	MaterialProperty heigtMapScale = null;
 	MaterialProperty heightMap = null;
-	MaterialProperty emissionScaleUI = null;
-	MaterialProperty emissionColorUI = null;
 	MaterialProperty emissionColorForRendering = null;
 	MaterialProperty emissionMap = null;
 	MaterialProperty detailMask = null;
@@ -75,6 +73,7 @@ internal class CustomStandardShaderGUI : ShaderGUI
 
 	MaterialEditor m_MaterialEditor;
 	WorkflowMode m_WorkflowMode = WorkflowMode.Specular;
+	ColorPickerHDRConfig m_ColorPickerHDRConfig = new ColorPickerHDRConfig(0f, 99f, 1/99f, 3f);
 
 	bool m_FirstTimeApply = true;
 
@@ -100,8 +99,6 @@ internal class CustomStandardShaderGUI : ShaderGUI
 		heigtMapScale = FindProperty ("_Parallax", props);
 		heightMap = FindProperty("_ParallaxMap", props);
 		occlusionStrength = FindProperty ("_OcclusionStrength", props);
-		emissionScaleUI = FindProperty ("_EmissionScaleUI", props);
-		emissionColorUI = FindProperty ("_EmissionColorUI", props);
 		emissionColorForRendering = FindProperty ("_EmissionColor", props);
 		emissionMap = FindProperty ("_EmissionMap", props);
 		detailMask = FindProperty ("_DetailMask", props);
@@ -197,7 +194,7 @@ internal class CustomStandardShaderGUI : ShaderGUI
 		}
 		material.SetFloat("_Mode", (float)blendMode);
 
-		DetermineWorkflow( MaterialEditor.GetMaterialProperties(new Material[] { material }) );
+		DetermineWorkflow( MaterialEditor.GetMaterialProperties (new Material[] { material }) );
 		MaterialChanged(material, m_WorkflowMode);
 	}
 
@@ -235,20 +232,23 @@ internal class CustomStandardShaderGUI : ShaderGUI
 
 	void DoEmissionArea(Material material)
 	{
-		bool showEmissionColorAndGIControls = emissionScaleUI.floatValue > 0f;
+		float brightness = emissionColorForRendering.colorValue.maxColorComponent;
+		bool showHelpBox = !HasValidEmissiveKeyword(material);
+		bool showEmissionColorAndGIControls = brightness > 0.0f;
+		
 		bool hadEmissionTexture = emissionMap.textureValue != null;
 
-		// Do controls
-		m_MaterialEditor.TexturePropertySingleLine(Styles.emissionText, emissionMap, showEmissionColorAndGIControls ? emissionColorUI : null, emissionScaleUI);
+		// Texture and HDR color controls
+		m_MaterialEditor.TexturePropertyWithHDRColor(Styles.emissionText, emissionMap, emissionColorForRendering, m_ColorPickerHDRConfig, false);
 
-		// Set default emissionScaleUI if texture was assigned
-		if (emissionMap.textureValue != null && !hadEmissionTexture && emissionScaleUI.floatValue <= 0f)
-			emissionScaleUI.floatValue = 1.0f;
+		// If texture was assigned and color was black set color to white
+		if (emissionMap.textureValue != null && !hadEmissionTexture && brightness <= 0f)
+			emissionColorForRendering.colorValue = Color.white;
 
 		// Dynamic Lightmapping mode
 		if (showEmissionColorAndGIControls)
 		{
-			bool shouldEmissionBeEnabled = ShouldEmissionBeEnabled(EvalFinalEmissionColor(material));
+			bool shouldEmissionBeEnabled = ShouldEmissionBeEnabled(emissionColorForRendering.colorValue);
 			EditorGUI.BeginDisabledGroup(!shouldEmissionBeEnabled);
 
 			m_MaterialEditor.LightmapEmissionProperty (MaterialEditor.kMiniTextureFieldLabelIndentLevel + 1);
@@ -256,11 +256,10 @@ internal class CustomStandardShaderGUI : ShaderGUI
 			EditorGUI.EndDisabledGroup();
 		}
 
-		if (!HasValidEmissiveKeyword(material))
+		if (showHelpBox)
 		{
 			EditorGUILayout.HelpBox(Styles.emissiveWarning.text, MessageType.Warning);
 		}
-
 	}
 
 	void DoSpecularMetallicArea()
@@ -287,6 +286,7 @@ internal class CustomStandardShaderGUI : ShaderGUI
 		switch (blendMode)
 		{
 			case BlendMode.Opaque:
+				material.SetOverrideTag("RenderType", "");
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
 				material.SetInt("_ZWrite", 1);
@@ -296,6 +296,7 @@ internal class CustomStandardShaderGUI : ShaderGUI
 				material.renderQueue = -1;
 				break;
 			case BlendMode.Cutout:
+				material.SetOverrideTag("RenderType", "TransparentCutout");
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
 				material.SetInt("_ZWrite", 1);
@@ -305,6 +306,7 @@ internal class CustomStandardShaderGUI : ShaderGUI
 				material.renderQueue = 2450;
 				break;
 			case BlendMode.Fade:
+				material.SetOverrideTag("RenderType", "Transparent");
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
 				material.SetInt("_ZWrite", 0);
@@ -314,6 +316,7 @@ internal class CustomStandardShaderGUI : ShaderGUI
 				material.renderQueue = 3000;
 				break;
 			case BlendMode.Transparent:
+				material.SetOverrideTag("RenderType", "Transparent");
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
 				material.SetInt("_ZWrite", 0);
@@ -324,16 +327,10 @@ internal class CustomStandardShaderGUI : ShaderGUI
 				break;
 		}
 	}
-
-	// Calculate final HDR _EmissionColor (gamma space) from _EmissionColorUI (LDR, gamma) & _EmissionScaleUI (gamma)
-	static Color EvalFinalEmissionColor(Material material)
-	{
-		return material.GetColor("_EmissionColorUI") * material.GetFloat("_EmissionScaleUI");
-	}
-
+	
 	static bool ShouldEmissionBeEnabled (Color color)
 	{
-		return color.grayscale > (0.1f / 255.0f);
+		return color.maxColorComponent > (0.1f / 255.0f);
 	}
 
 	static void SetMaterialKeywords(Material material, WorkflowMode workflowMode)
@@ -377,15 +374,6 @@ internal class CustomStandardShaderGUI : ShaderGUI
 
 	static void MaterialChanged(Material material, WorkflowMode workflowMode)
 	{
-		// Clamp EmissionScale to always positive
-		if (material.GetFloat("_EmissionScaleUI") < 0.0f)
-			material.SetFloat("_EmissionScaleUI", 0.0f);
-
-		// Apply combined emission value
-		Color emissionColorOut = EvalFinalEmissionColor (material);
-		material.SetColor("_EmissionColor", emissionColorOut);
-
-		// Handle Blending modes
 		SetupMaterialWithBlendMode(material, (BlendMode)material.GetFloat("_Mode"));
 
 		SetMaterialKeywords(material, workflowMode);
