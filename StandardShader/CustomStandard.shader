@@ -1,4 +1,4 @@
-Shader "Standard"
+Shader "CustomStandard"
 {
 	Properties
 	{
@@ -17,8 +17,7 @@ Shader "Standard"
 		_Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
 		_ParallaxMap ("Height Map", 2D) = "black" {}
 
-		_OcclusionStrength("Strength", Range(0.0, 1.0)) = 1.0
-		_OcclusionMap("Occlusion", 2D) = "white" {}
+		_OcclusionStrength("Strength", Range(0.0, 1.0)) = 0.0
 
 		_EmissionColor("Color", Color) = (0,0,0)
 		_EmissionMap("Emission", 2D) = "white" {}
@@ -82,7 +81,7 @@ Shader "Standard"
 			#pragma vertex vertForwardBase
 			#pragma fragment fragForwardBase
 
-			#include "UnityStandardCore.cginc"
+			#include "CustomUnityStandardCore.cginc"
 
 			ENDCG
 		}
@@ -117,7 +116,7 @@ Shader "Standard"
 			#pragma vertex vertForwardAdd
 			#pragma fragment fragForwardAdd
 
-			#include "UnityStandardCore.cginc"
+			#include "CustomUnityStandardCore.cginc"
 
 			ENDCG
 		}
@@ -177,7 +176,7 @@ Shader "Standard"
 			#pragma vertex vertDeferred
 			#pragma fragment fragDeferred
 
-			#include "UnityStandardCore.cginc"
+			#include "CustomUnityStandardCore.cginc"
 
 			ENDCG
 		}
@@ -200,7 +199,7 @@ Shader "Standard"
 			#pragma shader_feature _METALLICGLOSSMAP
 			#pragma shader_feature ___ _DETAIL_MULX2
 
-			#include "UnityStandardMeta.cginc"
+			#include "CustomUnityStandardMeta.cginc"
 			ENDCG
 		}
 	}
@@ -238,7 +237,7 @@ Shader "Standard"
 			#pragma vertex vertForwardBase
 			#pragma fragment fragForwardBase
 
-			#include "UnityStandardCore.cginc"
+			#include "CustomUnityStandardCore.cginc"
 
 			ENDCG
 		}
@@ -269,7 +268,7 @@ Shader "Standard"
 			#pragma vertex vertForwardAdd
 			#pragma fragment fragForwardAdd
 
-			#include "UnityStandardCore.cginc"
+			#include "CustomUnityStandardCore.cginc"
 
 			ENDCG
 		}
@@ -314,11 +313,11 @@ Shader "Standard"
 			#pragma shader_feature _METALLICGLOSSMAP
 			#pragma shader_feature ___ _DETAIL_MULX2
 
-			#include "UnityStandardMeta.cginc"
+			#include "CustomUnityStandardMeta.cginc"
 			ENDCG
 		}
 	}
 
 	FallBack "VertexLit"
-	CustomEditor "StandardShaderGUI"
+	CustomEditor "CustomStandardShaderGUI"
 }

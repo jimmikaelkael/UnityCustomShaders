@@ -1,5 +1,5 @@
-#ifndef UNITY_STANDARD_INPUT_INCLUDED
-#define UNITY_STANDARD_INPUT_INCLUDED
+#ifndef CUSTOM_UNITY_STANDARD_INPUT_INCLUDED
+#define CUSTOM_UNITY_STANDARD_INPUT_INCLUDED
 
 #include "UnityCG.cginc"
 #include "UnityShaderVariables.cginc"
@@ -39,7 +39,6 @@ sampler2D	_MetallicGlossMap;
 half		_Metallic;
 half		_Glossiness;
 
-sampler2D	_OcclusionMap;
 half		_OcclusionStrength;
 
 sampler2D	_ParallaxMap;
@@ -114,9 +113,9 @@ half Occlusion(float2 uv)
 #if (SHADER_TARGET < 30)
 	// SM20: instruction count limitation
 	// SM20: simpler occlusion
-	return tex2D(_OcclusionMap, uv).g;
+	return tex2D(_MainTex, uv).a;
 #else
-	half occ = tex2D(_OcclusionMap, uv).g;
+	half occ = tex2D(_MainTex, uv).a;
 	return LerpOneTo (occ, _OcclusionStrength);
 #endif
 }
@@ -190,4 +189,4 @@ float4 Parallax (float4 texcoords, half3 viewDir)
 #endif
 }
 			
-#endif // UNITY_STANDARD_INPUT_INCLUDED
+#endif // CUSTOM_UNITY_STANDARD_INPUT_INCLUDED

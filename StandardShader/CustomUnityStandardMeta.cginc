@@ -1,5 +1,5 @@
-#ifndef UNITY_STANDARD_META_INCLUDED
-#define UNITY_STANDARD_META_INCLUDED
+#ifndef CUSTOM_UNITY_STANDARD_META_INCLUDED
+#define CUSTOM_UNITY_STANDARD_META_INCLUDED
 
 // Functionality for Standard shader "meta" pass
 // (extracts albedo/emission for lightmapper etc.)
@@ -9,9 +9,9 @@
 #define UNITY_PASS_META 1
 
 #include "UnityCG.cginc"
-#include "UnityStandardInput.cginc"
+#include "CustomUnityStandardInput.cginc"
 #include "UnityMetaPass.cginc"
-#include "UnityStandardCore.cginc"
+#include "CustomUnityStandardCore.cginc"
 
 struct v2f_meta
 {
@@ -53,4 +53,4 @@ float4 frag_meta (v2f_meta i) : SV_Target
 	return UnityMetaFragment(o);
 }
 
-#endif // UNITY_STANDARD_META_INCLUDED
+#endif // CUSTOM_UNITY_STANDARD_META_INCLUDED

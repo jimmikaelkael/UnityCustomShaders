@@ -1,5 +1,5 @@
-#ifndef TERRAIN_SPLATMAP_COMMON_CGINC_INCLUDED
-#define TERRAIN_SPLATMAP_COMMON_CGINC_INCLUDED
+#ifndef CUSTOM_TERRAIN_SPLATMAP_COMMON_CGINC_INCLUDED
+#define CUSTOM_TERRAIN_SPLATMAP_COMMON_CGINC_INCLUDED
 
 struct Input
 {
@@ -57,20 +57,23 @@ void SplatmapMix(Input IN, out half4 splat_control, out half weight, out fixed4 
 	
 	#ifdef TERRAIN_STANDARD_SHADER
 		mixedDiffuse += splat_control.r * tex2D(_Splat0, IN.uv_Splat0) * half4(1.0, 1.0, 1.0, defaultAlpha.r);
-		mixedDiffuse += splat_control.g * tex2D(_Splat1, IN.uv_Splat1) * half4(1.0, 1.0, 1.0, defaultAlpha.g);
-		mixedDiffuse += splat_control.b * tex2D(_Splat2, IN.uv_Splat2) * half4(1.0, 1.0, 1.0, defaultAlpha.b);
+		mixedDiffuse += splat_control.g * (tex2D(_Splat1, IN.uv_Splat1) + tex2D(_Splat1, IN.uv_Splat1 * -0.25)) * 0.5 * half4(1.0, 1.0, 1.0, defaultAlpha.g);
+		//mixedDiffuse += splat_control.b * tex2D(_Splat2, IN.uv_Splat2) * tex2D(_Splat2, IN.uv_Splat2 * -0.25) * 4 * half4(1.0, 1.0, 1.0, defaultAlpha.b);
+		mixedDiffuse += splat_control.b * (tex2D(_Splat2, IN.uv_Splat2) + tex2D(_Splat2, IN.uv_Splat2 * -0.25)) * 0.5 * half4(1.0, 1.0, 1.0, defaultAlpha.b);
+		//mixedDiffuse += splat_control.b * tex2D(_Splat2, IN.uv_Splat2) * half4(1.0, 1.0, 1.0, defaultAlpha.b);
 		mixedDiffuse += splat_control.a * tex2D(_Splat3, IN.uv_Splat3) * half4(1.0, 1.0, 1.0, defaultAlpha.a);
 	#else
 		mixedDiffuse += splat_control.r * tex2D(_Splat0, IN.uv_Splat0);
-		mixedDiffuse += splat_control.g * tex2D(_Splat1, IN.uv_Splat1);
-		mixedDiffuse += splat_control.b * tex2D(_Splat2, IN.uv_Splat2);
+		mixedDiffuse += splat_control.g * (tex2D(_Splat1, IN.uv_Splat1) + tex2D(_Splat1, IN.uv_Splat1 * -0.25)) * 0.5;
+		//mixedDiffuse += splat_control.b * tex2D(_Splat2, IN.uv_Splat2) * tex2D(_Splat2, IN.uv_Splat2 * -0.25) * 4;
+		mixedDiffuse += splat_control.b * (tex2D(_Splat2, IN.uv_Splat2) + tex2D(_Splat2, IN.uv_Splat2 * -0.25)) * 0.5;
 		mixedDiffuse += splat_control.a * tex2D(_Splat3, IN.uv_Splat3);
 	#endif
 
 	#ifdef _TERRAIN_NORMAL_MAP
 		fixed4 nrm = 0.0f;
 		nrm += splat_control.r * tex2D(_Normal0, IN.uv_Splat0);
-		nrm += splat_control.g * tex2D(_Normal1, IN.uv_Splat1);
+		nrm += splat_control.g * (tex2D(_Normal1, IN.uv_Splat1) + tex2D(_Normal1, IN.uv_Splat1 * -0.4)) * 0.5;
 		nrm += splat_control.b * tex2D(_Normal2, IN.uv_Splat2);
 		nrm += splat_control.a * tex2D(_Normal3, IN.uv_Splat3);
 		mixedNormal = UnpackNormal(nrm);
