@@ -1,10 +1,10 @@
-#ifndef UNITY_STANDARD_CORE_INCLUDED
-#define UNITY_STANDARD_CORE_INCLUDED
+#ifndef CUSTOM_UNITY_STANDARD_CORE_INCLUDED
+#define CUSTOM_UNITY_STANDARD_CORE_INCLUDED
 
 #include "UnityCG.cginc"
 #include "UnityShaderVariables.cginc"
 #include "UnityStandardConfig.cginc"
-#include "UnityStandardInput.cginc"
+#include "CustomUnityStandardInput.cginc"
 #include "UnityPBSLighting.cginc"
 #include "UnityStandardUtils.cginc"
 #include "UnityStandardBRDF.cginc"
@@ -335,6 +335,8 @@ inline half4 VertexGIForward(VertexInput v, float3 posWorld, half3 normalWorld)
 
 // ------------------------------------------------------------------
 //  Base forward pass (directional light, emission, lightmaps, ...)
+
+#if UNITY_STANDARD_SIMPLE == 0
 
 struct VertexOutputForwardBase
 {
@@ -668,4 +670,4 @@ inline UnityGI FragmentGI (
 	return FragmentGI (posWorld, occlusion, i_ambientOrLightmapUV, atten, oneMinusRoughness, normalWorld, eyeVec, light, true);
 }
 
-#endif // UNITY_STANDARD_CORE_INCLUDED
+#endif // CUSTOM_UNITY_STANDARD_CORE_INCLUDED

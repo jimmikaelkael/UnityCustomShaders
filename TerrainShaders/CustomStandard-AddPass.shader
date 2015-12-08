@@ -1,4 +1,4 @@
-Shader "Hidden/TerrainEngine/Splatmap/Standard-AddPass" {
+Shader "Hidden/TerrainEngine/Splatmap/CustomStandard-AddPass" {
 	Properties {
 		// set by terrain engine
 		[HideInInspector] _Control ("Control (RGBA)", 2D) = "red" {}
@@ -39,8 +39,8 @@ Shader "Hidden/TerrainEngine/Splatmap/Standard-AddPass" {
 
 		#define TERRAIN_SPLAT_ADDPASS
 		#define TERRAIN_STANDARD_SHADER
-		#define TERRAIN_SURFACE_OUTPUT SurfaceOutputStandard
-		#include "TerrainSplatmapCommon.cginc"
+		#define TERRAIN_SURFACE_OUTPUT SurfaceOutputStandard	
+		#include "CustomTerrainSplatmapCommon.cginc"
 
 		half _Metallic0;
 		half _Metallic1;

@@ -1,4 +1,4 @@
-Shader "Nature/Terrain/Standard" {
+Shader "Nature/Terrain/CustomStandard" {
 	Properties {
 		// set by terrain engine
 		[HideInInspector] _Control ("Control (RGBA)", 2D) = "red" {}
@@ -41,8 +41,8 @@ Shader "Nature/Terrain/Standard" {
 		#pragma multi_compile __ _TERRAIN_NORMAL_MAP
 
 		#define TERRAIN_STANDARD_SHADER
-		#define TERRAIN_SURFACE_OUTPUT SurfaceOutputStandard
-		#include "TerrainSplatmapCommon.cginc"
+		#define TERRAIN_SURFACE_OUTPUT SurfaceOutputStandard	
+		#include "CustomTerrainSplatmapCommon.cginc"
 
 		half _Metallic0;
 		half _Metallic1;
@@ -68,7 +68,7 @@ Shader "Nature/Terrain/Standard" {
 		ENDCG
 	}
 
-	Dependency "AddPassShader" = "Hidden/TerrainEngine/Splatmap/Standard-AddPass"
+	Dependency "AddPassShader" = "Hidden/TerrainEngine/Splatmap/CustomStandard-AddPass"
 	Dependency "BaseMapShader" = "Hidden/TerrainEngine/Splatmap/Standard-Base"
 
 	Fallback "Nature/Terrain/Diffuse"

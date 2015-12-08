@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace UnityEditor
 {
-internal class StandardShaderGUI : ShaderGUI
+internal class CustomStandardShaderGUI : ShaderGUI
 {
 	private enum WorkflowMode
 	{
@@ -27,14 +27,14 @@ internal class StandardShaderGUI : ShaderGUI
 		public static GUIContent[] uvSetOptions = new GUIContent[] { new GUIContent("UV channel 0"), new GUIContent("UV channel 1") };
 
 		public static string emptyTootip = "";
-		public static GUIContent albedoText = new GUIContent("Albedo", "Albedo (RGB) and Transparency (A)");
+		public static GUIContent albedoText = new GUIContent("Albedo", "Albedo (RGB) and Occlusion/Transparency (A)");
+		public static GUIContent occlusionStrengthText = new GUIContent("Occlusion", "");
 		public static GUIContent alphaCutoffText = new GUIContent("Alpha Cutoff", "Threshold for alpha cutoff");
 		public static GUIContent specularMapText = new GUIContent("Specular", "Specular (RGB) and Smoothness (A)");
 		public static GUIContent metallicMapText = new GUIContent("Metallic", "Metallic (R) and Smoothness (A)");
 		public static GUIContent smoothnessText = new GUIContent("Smoothness", "");
 		public static GUIContent normalMapText = new GUIContent("Normal Map", "Normal Map");
 		public static GUIContent heightMapText = new GUIContent("Height Map", "Height Map (G)");
-		public static GUIContent occlusionText = new GUIContent("Occlusion", "Occlusion (G)");
 		public static GUIContent emissionText = new GUIContent("Emission", "Emission (RGB)");
 		public static GUIContent detailMaskText = new GUIContent("Detail Mask", "Mask for Secondary Maps (A)");
 		public static GUIContent detailAlbedoText = new GUIContent("Detail Albedo x2", "Albedo (RGB) multiplied by 2");
@@ -61,7 +61,6 @@ internal class StandardShaderGUI : ShaderGUI
 	MaterialProperty bumpScale = null;
 	MaterialProperty bumpMap = null;
 	MaterialProperty occlusionStrength = null;
-	MaterialProperty occlusionMap = null;
 	MaterialProperty heigtMapScale = null;
 	MaterialProperty heightMap = null;
 	MaterialProperty emissionColorForRendering = null;
@@ -100,7 +99,6 @@ internal class StandardShaderGUI : ShaderGUI
 		heigtMapScale = FindProperty ("_Parallax", props);
 		heightMap = FindProperty("_ParallaxMap", props);
 		occlusionStrength = FindProperty ("_OcclusionStrength", props);
-		occlusionMap = FindProperty ("_OcclusionMap", props);
 		emissionColorForRendering = FindProperty ("_EmissionColor", props);
 		emissionMap = FindProperty ("_EmissionMap", props);
 		detailMask = FindProperty ("_DetailMask", props);
@@ -143,7 +141,6 @@ internal class StandardShaderGUI : ShaderGUI
 			DoSpecularMetallicArea();
 			m_MaterialEditor.TexturePropertySingleLine(Styles.normalMapText, bumpMap, bumpMap.textureValue != null ? bumpScale : null);
 			m_MaterialEditor.TexturePropertySingleLine(Styles.heightMapText, heightMap, heightMap.textureValue != null ? heigtMapScale : null);
-			m_MaterialEditor.TexturePropertySingleLine(Styles.occlusionText, occlusionMap, occlusionMap.textureValue != null ? occlusionStrength : null);
 			DoEmissionArea(material);
 			m_MaterialEditor.TexturePropertySingleLine(Styles.detailMaskText, detailMask);
 			EditorGUI.BeginChangeCheck();
@@ -226,7 +223,14 @@ internal class StandardShaderGUI : ShaderGUI
 
 	void DoAlbedoArea(Material material)
 	{
-		m_MaterialEditor.TexturePropertySingleLine(Styles.albedoText, albedoMap, albedoColor);
+		if ((BlendMode)material.GetFloat("_Mode") == BlendMode.Opaque)
+		{
+			m_MaterialEditor.TexturePropertyTwoLines(Styles.albedoText, albedoMap, albedoColor, Styles.occlusionStrengthText, occlusionStrength);
+		}
+		else
+		{
+			m_MaterialEditor.TexturePropertySingleLine(Styles.albedoText, albedoMap, albedoColor);
+		}
 		if (((BlendMode)material.GetFloat("_Mode") == BlendMode.Cutout))
 		{
 			m_MaterialEditor.ShaderProperty(alphaCutoff, Styles.alphaCutoffText.text, MaterialEditor.kMiniTextureFieldLabelIndentLevel+1);
