@@ -39,7 +39,7 @@ Shader "Hidden/TerrainEngine/Splatmap/CustomStandard-AddPass" {
 
 		#define TERRAIN_SPLAT_ADDPASS
 		#define TERRAIN_STANDARD_SHADER
-		#define TERRAIN_SURFACE_OUTPUT SurfaceOutputStandard	
+		#define TERRAIN_SURFACE_OUTPUT SurfaceOutputStandard
 		#include "CustomTerrainSplatmapCommon.cginc"
 
 		half _Metallic0;

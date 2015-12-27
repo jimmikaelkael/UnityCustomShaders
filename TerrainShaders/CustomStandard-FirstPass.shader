@@ -41,7 +41,7 @@ Shader "Nature/Terrain/CustomStandard" {
 		#pragma multi_compile __ _TERRAIN_NORMAL_MAP
 
 		#define TERRAIN_STANDARD_SHADER
-		#define TERRAIN_SURFACE_OUTPUT SurfaceOutputStandard	
+		#define TERRAIN_SURFACE_OUTPUT SurfaceOutputStandard
 		#include "CustomTerrainSplatmapCommon.cginc"
 
 		half _Metallic0;

@@ -336,8 +336,6 @@ inline half4 VertexGIForward(VertexInput v, float3 posWorld, half3 normalWorld)
 // ------------------------------------------------------------------
 //  Base forward pass (directional light, emission, lightmaps, ...)
 
-#if UNITY_STANDARD_SIMPLE == 0
-
 struct VertexOutputForwardBase
 {
 	float4 pos							: SV_POSITION;
